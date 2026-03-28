@@ -10,6 +10,7 @@ dependencies {
     api(libs.lifecycle.viewmodel.compose)
     api(libs.coroutines.android)
     api(libs.kotlinx.serialization.json)
+    compileOnly(libs.javax.inject)
     testImplementation(libs.junit)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.turbine)

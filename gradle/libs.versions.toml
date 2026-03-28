@@ -18,6 +18,7 @@ coroutines = "1.10.2"
 lifecycle = "2.10.0"
 activity-compose = "1.13.0"
 core-ktx = "1.18.0"
+javax-inject = "1"
 junit = "4.13.2"
 mockk = "1.14.9"
 turbine = "1.2.1"
@@ -52,6 +53,7 @@ navigation3-ui = { group = "androidx.navigation3", name = "navigation3-ui", vers
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
 hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hilt-navigation-compose" }
+javax-inject = { group = "javax.inject", name = "javax.inject", version.ref = "javax-inject" }
 
 # Network
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
