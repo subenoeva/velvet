@@ -1,4 +1,11 @@
 // Top-level build file. Module-specific config lives in convention plugins (build-logic).
+
+tasks.register("testAll") {
+    description = "Runs unit tests for all modules"
+    group = "verification"
+    dependsOn(subprojects.flatMap { sub -> sub.tasks.matching { it.name == "test" } })
+}
+
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.library) apply false

@@ -12,6 +12,7 @@ dependencies {
     api(libs.coroutines.core)
     api(libs.paging.common)
     api(libs.kotlinx.serialization.json)
+    implementation(libs.javax.inject)
     testImplementation(libs.junit)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.mockk)
