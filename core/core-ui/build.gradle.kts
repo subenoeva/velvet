@@ -15,6 +15,7 @@ dependencies {
     api(libs.compose.material3)
     api(libs.compose.ui.tooling.preview)
     api(libs.compose.runtime)
+    api(libs.compose.material.icons.core)
     debugImplementation(libs.compose.ui.tooling)
 
     api(libs.coil.compose)
