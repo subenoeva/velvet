@@ -22,7 +22,8 @@ import com.subenoeva.velvet.core.ui.theme.VelvetTextSecondary
 fun ErrorState(
     message: String,
     onRetry: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    retryLabel: String = "Reintentar"
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -43,7 +44,7 @@ fun ErrorState(
         )
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = onRetry) {
-            Text(text = "Reintentar")
+            Text(text = retryLabel)
         }
     }
 }

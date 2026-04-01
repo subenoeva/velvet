@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.subenoeva.velvet.core.ui.theme.VelvetCard
@@ -69,6 +70,7 @@ fun MovieCard(
             style = MaterialTheme.typography.titleSmall,
             color = VelvetText,
             maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
             modifier = Modifier
                 .padding(horizontal = 8.dp, vertical = 10.dp)
         )

@@ -16,6 +16,7 @@ import com.subenoeva.velvet.core.ui.theme.VelvetSurface
 fun VelvetTopBar(
     title: String = "Velvet",
     modifier: Modifier = Modifier,
+    navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {}
 ) {
     CenterAlignedTopAppBar(
@@ -26,6 +27,7 @@ fun VelvetTopBar(
                 color = VelvetAccent
             )
         },
+        navigationIcon = navigationIcon,
         actions = actions,
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = VelvetSurface

@@ -24,7 +24,7 @@ import com.subenoeva.velvet.core.ui.theme.VelvetCard
 import com.subenoeva.velvet.core.ui.theme.VelvetSurface
 
 @Composable
-fun LoadingShimmer(modifier: Modifier = Modifier) {
+private fun rememberShimmerBrush(): Brush {
     val infiniteTransition = rememberInfiniteTransition(label = "shimmer")
     val translateAnim by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -35,8 +35,7 @@ fun LoadingShimmer(modifier: Modifier = Modifier) {
         ),
         label = "shimmer_translate"
     )
-
-    val shimmerBrush = Brush.linearGradient(
+    return Brush.linearGradient(
         colors = listOf(
             VelvetCard,
             VelvetSurface,
@@ -45,7 +44,11 @@ fun LoadingShimmer(modifier: Modifier = Modifier) {
         start = Offset(translateAnim - 200f, 0f),
         end = Offset(translateAnim, 0f)
     )
+}
 
+@Composable
+fun LoadingShimmer(modifier: Modifier = Modifier) {
+    val shimmerBrush = rememberShimmerBrush()
     Box(
         modifier = modifier.background(shimmerBrush)
     )
@@ -53,26 +56,7 @@ fun LoadingShimmer(modifier: Modifier = Modifier) {
 
 @Composable
 fun ShimmerMovieCard(modifier: Modifier = Modifier) {
-    val infiniteTransition = rememberInfiniteTransition(label = "shimmer_card")
-    val translateAnim by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1000f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1200),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "shimmer_card_translate"
-    )
-
-    val shimmerBrush = Brush.linearGradient(
-        colors = listOf(
-            VelvetCard,
-            VelvetSurface,
-            VelvetCard
-        ),
-        start = Offset(translateAnim - 200f, 0f),
-        end = Offset(translateAnim, 0f)
-    )
+    val shimmerBrush = rememberShimmerBrush()
 
     Column(
         modifier = modifier.width(140.dp)
