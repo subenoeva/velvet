@@ -12,6 +12,7 @@ android {
 dependencies {
     implementation(project(":core:core-common"))
     implementation(project(":core:core-domain"))
+    implementation(project(":core:core-database"))
 
     implementation(libs.retrofit)
     implementation(libs.retrofit.kotlinx.serialization)
@@ -21,6 +22,7 @@ dependencies {
 
     implementation(libs.paging.runtime)
     implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
