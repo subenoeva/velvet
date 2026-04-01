@@ -14,7 +14,6 @@ val VelvetTypography = Typography(
         fontSize = 52.sp,
         lineHeight = 60.sp,
         letterSpacing = (-0.5).sp,
-        color = VelvetText
     ),
     // Section headers (e.g. "Trending", "Top Rated")
     titleLarge = TextStyle(
@@ -23,7 +22,6 @@ val VelvetTypography = Typography(
         fontSize = 20.sp,
         lineHeight = 26.sp,
         letterSpacing = 0.15.sp,
-        color = VelvetText
     ),
     // Movie title on cards
     titleMedium = TextStyle(
@@ -32,7 +30,6 @@ val VelvetTypography = Typography(
         fontSize = 16.sp,
         lineHeight = 22.sp,
         letterSpacing = 0.1.sp,
-        color = VelvetText
     ),
     // Overview / synopsis text
     bodyMedium = TextStyle(
@@ -41,7 +38,6 @@ val VelvetTypography = Typography(
         fontSize = 14.sp,
         lineHeight = 22.sp,
         letterSpacing = 0.25.sp,
-        color = VelvetTextSecondary
     ),
     // Secondary metadata (release year, genre chips)
     bodySmall = TextStyle(
@@ -50,7 +46,6 @@ val VelvetTypography = Typography(
         fontSize = 12.sp,
         lineHeight = 18.sp,
         letterSpacing = 0.4.sp,
-        color = VelvetTextSecondary
     ),
     // Rating badge label
     labelSmall = TextStyle(
@@ -59,6 +54,5 @@ val VelvetTypography = Typography(
         fontSize = 10.sp,
         lineHeight = 14.sp,
         letterSpacing = 0.5.sp,
-        color = VelvetText
     )
 )
