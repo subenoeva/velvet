@@ -14,8 +14,8 @@ import com.subenoeva.velvet.core.ui.theme.VelvetSurface
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VelvetTopBar(
-    title: String = "Velvet",
     modifier: Modifier = Modifier,
+    title: String = "Velvet",
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {}
 ) {
