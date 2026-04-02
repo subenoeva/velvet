@@ -30,27 +30,22 @@ class HomeViewModelTest {
 
     private val testDispatcher = UnconfinedTestDispatcher()
 
-    private val getTrending: GetTrendingMoviesUseCase = mockk {
-        every { invoke(NoParams) } returns flowOf(Result.Success(emptyList()))
-    }
-    private val getPopularPreview: GetPopularPreviewUseCase = mockk {
-        every { invoke(NoParams) } returns flowOf(Result.Success(emptyList()))
-    }
-    private val getTopRatedPreview: GetTopRatedPreviewUseCase = mockk {
-        every { invoke(NoParams) } returns flowOf(Result.Success(emptyList()))
-    }
-    private val getUpcomingPreview: GetUpcomingPreviewUseCase = mockk {
-        every { invoke(NoParams) } returns flowOf(Result.Success(emptyList()))
-    }
-    private val dispatchers: DispatcherProvider = mockk {
-        every { io } returns testDispatcher
-    }
+    private val getTrending: GetTrendingMoviesUseCase = mockk()
+    private val getPopularPreview: GetPopularPreviewUseCase = mockk()
+    private val getTopRatedPreview: GetTopRatedPreviewUseCase = mockk()
+    private val getUpcomingPreview: GetUpcomingPreviewUseCase = mockk()
+    private val dispatchers: DispatcherProvider = mockk()
 
     private lateinit var viewModel: HomeViewModel
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
+        every { getTrending(NoParams) } returns flowOf<Result<List<Movie>>>(Result.Success(emptyList()))
+        every { getPopularPreview(NoParams) } returns flowOf<Result<List<Movie>>>(Result.Success(emptyList()))
+        every { getTopRatedPreview(NoParams) } returns flowOf<Result<List<Movie>>>(Result.Success(emptyList()))
+        every { getUpcomingPreview(NoParams) } returns flowOf<Result<List<Movie>>>(Result.Success(emptyList()))
+        every { dispatchers.io } returns testDispatcher
         viewModel = HomeViewModel(getTrending, getPopularPreview, getTopRatedPreview, getUpcomingPreview, dispatchers)
     }
 
@@ -71,7 +66,7 @@ class HomeViewModelTest {
     @Test
     fun `initial load populates state from use cases`() = runTest {
         val trendingMovies = listOf(Movie(1, "Movie 1", "", null, null, 7.5, "2024-01-01", emptyList()))
-        every { getTrending.invoke(NoParams) } returns flowOf(Result.Success(trendingMovies))
+        every { getTrending.invoke(NoParams) } returns flowOf<Result<List<Movie>>>(Result.Success(trendingMovies))
 
         val vm = HomeViewModel(getTrending, getPopularPreview, getTopRatedPreview, getUpcomingPreview, dispatchers)
 
