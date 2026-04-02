@@ -12,6 +12,7 @@ interface MovieRepository {
     fun getPopular(): Flow<PagingData<Movie>>
     fun getTopRated(): Flow<PagingData<Movie>>
     fun getUpcoming(): Flow<PagingData<Movie>>
+    fun getCategoryPreview(category: String, limit: Int = 10): Flow<Result<List<Movie>>>
     fun search(query: String): Flow<PagingData<Movie>>
     fun getMovieDetail(movieId: Int): Flow<Result<MovieDetail>>
     fun getCast(movieId: Int): Flow<Result<List<Cast>>>
