@@ -30,5 +30,4 @@ class HomeViewModel
             is OnMovieClick -> sendEvent(NavigateToDetail(intent.movieId))
         }
     }
-
 }

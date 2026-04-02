@@ -50,29 +50,26 @@ fun MovieCard(
                 )
             } else {
                 AsyncImage(
+                    modifier = Modifier.fillMaxWidth(),
                     model = "$TMDB_IMAGE_BASE_URL$posterPath",
                     contentDescription = title,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(210.dp)
+                    contentScale = ContentScale.Crop
                 )
             }
             RatingBadge(
-                rating = rating,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .offset(x = (-8).dp, y = 8.dp)
+                    .offset(x = (-8).dp, y = 8.dp),
+                rating = rating
             )
         }
         Text(
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 10.dp),
             text = title,
             style = MaterialTheme.typography.titleSmall,
             color = VelvetText,
             maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier
-                .padding(horizontal = 8.dp, vertical = 10.dp)
+            overflow = TextOverflow.Ellipsis
         )
     }
 }

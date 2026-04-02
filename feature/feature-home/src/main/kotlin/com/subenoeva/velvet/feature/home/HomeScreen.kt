@@ -58,8 +58,8 @@ private fun HomeScreenContent(
         contentAlignment = Alignment.Center
     ) {
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(140.dp), // Se adapta al tamaño del MovieCard
             modifier = Modifier.fillMaxSize(),
+            columns = GridCells.Adaptive(minSize = 140.dp),
             contentPadding = PaddingValues(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)

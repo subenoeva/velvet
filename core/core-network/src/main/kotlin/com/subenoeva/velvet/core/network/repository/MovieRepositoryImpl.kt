@@ -8,6 +8,7 @@ import androidx.paging.map
 import com.subenoeva.velvet.core.common.dispatcher.DispatcherProvider
 import com.subenoeva.velvet.core.common.result.Result
 import com.subenoeva.velvet.core.database.VelvetDatabase
+import com.subenoeva.velvet.core.database.entity.MovieCategoryEntity
 import com.subenoeva.velvet.core.database.mapper.toDomain
 import com.subenoeva.velvet.core.database.mapper.toFavoriteEntity
 import com.subenoeva.velvet.core.database.mapper.toMovie
@@ -17,7 +18,6 @@ import com.subenoeva.velvet.core.domain.model.MovieDetail
 import com.subenoeva.velvet.core.domain.repository.MovieRepository
 import com.subenoeva.velvet.core.network.api.TmdbApiService
 import com.subenoeva.velvet.core.network.mapper.toEntity
-import com.subenoeva.velvet.core.database.entity.MovieCategoryEntity
 import com.subenoeva.velvet.core.network.mediator.PopularMoviesRemoteMediator
 import com.subenoeva.velvet.core.network.mediator.SearchMoviesRemoteMediator
 import com.subenoeva.velvet.core.network.mediator.TopRatedMoviesRemoteMediator
@@ -31,6 +31,7 @@ import javax.inject.Inject
 private const val PAGE_SIZE = 20
 private const val TRENDING_TTL_MS = 30 * 60 * 1000L
 
+@OptIn(ExperimentalPagingApi::class)
 class MovieRepositoryImpl @Inject constructor(
     private val apiService: TmdbApiService,
     private val database: VelvetDatabase,
@@ -44,7 +45,8 @@ class MovieRepositoryImpl @Inject constructor(
         emit(Result.Loading)
         try {
             val lastUpdated = movieDao.getLastUpdatedForCategory("trending")
-            val isStale = lastUpdated == null || System.currentTimeMillis() - lastUpdated > TRENDING_TTL_MS
+            val isStale =
+                lastUpdated == null || System.currentTimeMillis() - lastUpdated > TRENDING_TTL_MS
             if (isStale) {
                 val dtos = apiService.getTrending().results
                 val entities = dtos.map { it.toEntity() }
@@ -72,28 +74,24 @@ class MovieRepositoryImpl @Inject constructor(
         }
     }.flowOn(dispatchers.io)
 
-    @OptIn(ExperimentalPagingApi::class)
     override fun getPopular(): Flow<PagingData<Movie>> = Pager(
         config = PagingConfig(pageSize = PAGE_SIZE, enablePlaceholders = false),
         remoteMediator = PopularMoviesRemoteMediator(apiService, database),
         pagingSourceFactory = { movieDao.getMoviesByCategory("popular") }
     ).flow.map { pagingData -> pagingData.map { it.toDomain() } }
 
-    @OptIn(ExperimentalPagingApi::class)
     override fun getTopRated(): Flow<PagingData<Movie>> = Pager(
         config = PagingConfig(pageSize = PAGE_SIZE, enablePlaceholders = false),
         remoteMediator = TopRatedMoviesRemoteMediator(apiService, database),
         pagingSourceFactory = { movieDao.getMoviesByCategory("top_rated") }
     ).flow.map { pagingData -> pagingData.map { it.toDomain() } }
 
-    @OptIn(ExperimentalPagingApi::class)
     override fun getUpcoming(): Flow<PagingData<Movie>> = Pager(
         config = PagingConfig(pageSize = PAGE_SIZE, enablePlaceholders = false),
         remoteMediator = UpcomingMoviesRemoteMediator(apiService, database),
         pagingSourceFactory = { movieDao.getMoviesByCategory("upcoming") }
     ).flow.map { pagingData -> pagingData.map { it.toDomain() } }
 
-    @OptIn(ExperimentalPagingApi::class)
     override fun search(query: String): Flow<PagingData<Movie>> = Pager(
         config = PagingConfig(pageSize = PAGE_SIZE, enablePlaceholders = false),
         remoteMediator = SearchMoviesRemoteMediator(query, apiService, database),
@@ -110,7 +108,10 @@ class MovieRepositoryImpl @Inject constructor(
             emit(Result.Success(movieDao.getMovieDetail(movieId)!!.toDomain()))
         } catch (e: Exception) {
             val cached = movieDao.getMovieDetail(movieId)
-            if (cached != null) emit(Result.Success(cached.toDomain())) else emit(Result.Error(e))
+            if (cached != null)
+                emit(Result.Success(cached.toDomain()))
+            else
+                emit(Result.Error(e))
         }
     }.flowOn(dispatchers.io)
 
@@ -124,7 +125,10 @@ class MovieRepositoryImpl @Inject constructor(
             emit(Result.Success(movieDao.getCast(movieId).map { it.toDomain() }))
         } catch (e: Exception) {
             val cached = movieDao.getCast(movieId)
-            if (cached.isNotEmpty()) emit(Result.Success(cached.map { it.toDomain() })) else emit(Result.Error(e))
+            if (cached.isNotEmpty())
+                emit(Result.Success(cached.map { it.toDomain() }))
+            else
+                emit(Result.Error(e))
         }
     }.flowOn(dispatchers.io)
 
