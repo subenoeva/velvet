@@ -1,124 +1,80 @@
 package com.subenoeva.velvet.feature.home
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.paging.LoadState
-import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.itemContentType
-import androidx.paging.compose.itemKey
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.subenoeva.velvet.core.common.presentation.ObserveEvents
-import com.subenoeva.velvet.core.domain.model.Movie
 import com.subenoeva.velvet.core.ui.component.ErrorState
-import com.subenoeva.velvet.core.ui.component.MovieCard
-import com.subenoeva.velvet.core.ui.component.ShimmerMovieCard
-import com.subenoeva.velvet.feature.home.HomeViewContract.Event.NavigateToDetail
-import com.subenoeva.velvet.feature.home.HomeViewContract.Intent.OnMovieClick
-
-private val GRID_SPACING = 16.dp
-private val CARD_MIN_SIZE = 140.dp
+import com.subenoeva.velvet.feature.home.HomeViewContract.Event
+import com.subenoeva.velvet.feature.home.HomeViewContract.Intent
+import com.subenoeva.velvet.feature.home.HomeViewContract.State
+import com.subenoeva.velvet.feature.home.component.MovieRow
+import com.subenoeva.velvet.feature.home.component.TrendingCarousel
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     onNavigateToDetail: (Int) -> Unit
 ) {
-    val movies = viewModel.moviesPagingFlow.collectAsLazyPagingItems()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     ObserveEvents(viewModel.events) { event ->
         when (event) {
-            is NavigateToDetail -> onNavigateToDetail(event.movieId)
+            is Event.NavigateToDetail -> onNavigateToDetail(event.movieId)
         }
     }
 
     HomeScreenContent(
-        movies = movies,
-        onMovieClick = { movieId -> viewModel.sendIntent(OnMovieClick(movieId)) }
+        state = state,
+        onMovieClick = { viewModel.sendIntent(Intent.OnMovieClick(it)) },
+        onRetry = { viewModel.sendIntent(Intent.Refresh) }
     )
 }
 
 @Composable
 private fun HomeScreenContent(
-    movies: LazyPagingItems<Movie>,
-    onMovieClick: (Int) -> Unit
+    state: State,
+    onMovieClick: (Int) -> Unit,
+    onRetry: () -> Unit
 ) {
-    when (val refreshState = movies.loadState.refresh) {
-        is LoadState.Loading -> ShimmerGrid()
-        is LoadState.Error -> ErrorState(
-            message = refreshState.error.localizedMessage ?: "Error al cargar películas",
-            onRetry = { movies.retry() },
+    when {
+        state.isLoading && state.trending.isEmpty() -> HomeShimmer()
+        state.error != null && state.trending.isEmpty() -> ErrorState(
+            message = state.error,
+            onRetry = onRetry,
             modifier = Modifier.fillMaxSize()
         )
-
-        else -> MovieGrid(movies = movies, onMovieClick = onMovieClick)
-    }
-}
-
-@Composable
-private fun ShimmerGrid() {
-    LazyVerticalGrid(
-        modifier = Modifier.fillMaxSize(),
-        columns = GridCells.Adaptive(minSize = CARD_MIN_SIZE),
-        contentPadding = PaddingValues(GRID_SPACING),
-        horizontalArrangement = Arrangement.spacedBy(GRID_SPACING),
-        verticalArrangement = Arrangement.spacedBy(GRID_SPACING)
-    ) {
-        items(6) { ShimmerMovieCard(modifier = Modifier.fillMaxWidth()) }
-    }
-}
-
-@Composable
-private fun MovieGrid(
-    movies: LazyPagingItems<Movie>,
-    onMovieClick: (Int) -> Unit
-) {
-    LazyVerticalGrid(
-        modifier = Modifier.fillMaxSize(),
-        columns = GridCells.Adaptive(minSize = CARD_MIN_SIZE),
-        contentPadding = PaddingValues(GRID_SPACING),
-        horizontalArrangement = Arrangement.spacedBy(GRID_SPACING),
-        verticalArrangement = Arrangement.spacedBy(GRID_SPACING)
-    ) {
-        items(
-            count = movies.itemCount,
-            key = movies.itemKey { it.id },
-            contentType = movies.itemContentType { "movie" }
-        ) { index ->
-            val movie = movies[index]
-            if (movie != null) {
-                MovieCard(
-                    posterPath = movie.posterPath,
-                    title = movie.title,
-                    rating = movie.voteAverage,
-                    onClick = { onMovieClick(movie.id) }
-                )
+        else -> LazyColumn(modifier = Modifier.fillMaxSize()) {
+            if (state.trending.isNotEmpty()) {
+                item { TrendingCarousel(movies = state.trending, onMovieClick = onMovieClick) }
+            }
+            if (state.popular.isNotEmpty()) {
+                item { MovieRow(title = "Populares", movies = state.popular, onMovieClick = onMovieClick) }
+            }
+            if (state.topRated.isNotEmpty()) {
+                item { MovieRow(title = "Mejor valoradas", movies = state.topRated, onMovieClick = onMovieClick) }
+            }
+            if (state.upcoming.isNotEmpty()) {
+                item { MovieRow(title = "Próximos estrenos", movies = state.upcoming, onMovieClick = onMovieClick) }
             }
         }
+    }
+}
 
-        if (movies.loadState.append is LoadState.Loading) {
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(GRID_SPACING),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            }
+@Composable
+private fun HomeShimmer() {
+    // Placeholder shown while initial load is in progress
+    // Uses LoadingShimmer from core-ui — implement as a LazyColumn with shimmer items
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        item {
+            com.subenoeva.velvet.core.ui.component.LoadingShimmer(
+                modifier = Modifier
+                    .fillMaxSize()
+            )
         }
     }
 }
