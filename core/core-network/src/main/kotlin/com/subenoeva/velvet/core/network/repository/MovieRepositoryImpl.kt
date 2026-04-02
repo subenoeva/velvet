@@ -30,6 +30,7 @@ import javax.inject.Inject
 
 private const val PAGE_SIZE = 20
 private const val TRENDING_TTL_MS = 30 * 60 * 1000L
+private const val CATEGORY_TTL_MS = 30 * 60 * 1000L
 
 @OptIn(ExperimentalPagingApi::class)
 class MovieRepositoryImpl @Inject constructor(
@@ -91,6 +92,37 @@ class MovieRepositoryImpl @Inject constructor(
         remoteMediator = UpcomingMoviesRemoteMediator(apiService, database),
         pagingSourceFactory = { movieDao.getMoviesByCategory("upcoming") }
     ).flow.map { pagingData -> pagingData.map { it.toDomain() } }
+
+    override fun getCategoryPreview(category: String, limit: Int): Flow<Result<List<Movie>>> = flow {
+        emit(Result.Loading)
+        try {
+            val lastUpdated = movieDao.getLastUpdatedForCategory(category)
+            val isStale = lastUpdated == null || System.currentTimeMillis() - lastUpdated > CATEGORY_TTL_MS
+            if (isStale) {
+                val response = when (category) {
+                    "popular"   -> apiService.getPopular(1)
+                    "top_rated" -> apiService.getTopRated(1)
+                    "upcoming"  -> apiService.getUpcoming(1)
+                    else        -> throw IllegalArgumentException("Unknown category: $category")
+                }
+                val entities = response.results.map { it.toEntity() }
+                movieDao.upsertMovies(entities)
+                movieDao.clearCategoryMovies(category)
+                movieDao.insertCategoryMovies(
+                    entities.mapIndexed { index, entity ->
+                        MovieCategoryEntity(entity.id, category, 1, index)
+                    }
+                )
+            }
+        } catch (e: Exception) { /* serve from cache on network failure */ }
+        movieDao.getMoviesByCategoryPreview(category, limit)
+            .collect { entities ->
+                if (entities.isNotEmpty())
+                    emit(Result.Success(entities.map { it.toDomain() }))
+                else
+                    emit(Result.Error(Exception("No $category movies available")))
+            }
+    }.flowOn(dispatchers.io)
 
     override fun search(query: String): Flow<PagingData<Movie>> = Pager(
         config = PagingConfig(pageSize = PAGE_SIZE, enablePlaceholders = false),
