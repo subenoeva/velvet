@@ -66,7 +66,7 @@ class HomeViewModelTest {
     @Test
     fun `initial load populates state from use cases`() = runTest {
         val trendingMovies = listOf(Movie(1, "Movie 1", "", null, null, 7.5, "2024-01-01", emptyList()))
-        every { getTrending.invoke(NoParams) } returns flowOf<Result<List<Movie>>>(Result.Success(trendingMovies))
+        every { getTrending(NoParams) } returns flowOf<Result<List<Movie>>>(Result.Success(trendingMovies))
 
         val vm = HomeViewModel(getTrending, getPopularPreview, getTopRatedPreview, getUpcomingPreview, dispatchers)
 

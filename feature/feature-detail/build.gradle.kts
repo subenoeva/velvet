@@ -7,8 +7,11 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:core-network"))
-    implementation(project(":core:core-database"))
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.material3)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.turbine)
+    testImplementation(libs.coroutines.test)
 }

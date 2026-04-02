@@ -10,9 +10,11 @@ import com.subenoeva.velvet.core.domain.usecase.movie.GetTopRatedPreviewUseCase
 import com.subenoeva.velvet.core.domain.usecase.movie.GetTrendingMoviesUseCase
 import com.subenoeva.velvet.core.domain.usecase.movie.GetUpcomingPreviewUseCase
 import com.subenoeva.velvet.feature.home.HomeViewContract.Event
+import com.subenoeva.velvet.feature.home.HomeViewContract.Event.NavigateToCategoryList
 import com.subenoeva.velvet.feature.home.HomeViewContract.Event.NavigateToDetail
 import com.subenoeva.velvet.feature.home.HomeViewContract.Intent
 import com.subenoeva.velvet.feature.home.HomeViewContract.Intent.OnMovieClick
+import com.subenoeva.velvet.feature.home.HomeViewContract.Intent.OnSeeAllClick
 import com.subenoeva.velvet.feature.home.HomeViewContract.State
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -34,6 +36,7 @@ class HomeViewModel @Inject constructor(
     override suspend fun handleIntent(intent: Intent) = when (intent) {
         Intent.LoadContent, Intent.Refresh -> loadContent()
         is OnMovieClick -> sendEvent(NavigateToDetail(intent.movieId))
+        is OnSeeAllClick -> sendEvent(NavigateToCategoryList(intent.category, intent.title))
     }
 
     private var contentJob: Job? = null

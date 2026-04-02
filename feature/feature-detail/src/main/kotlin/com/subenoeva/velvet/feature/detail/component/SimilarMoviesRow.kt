@@ -1,19 +1,15 @@
-package com.subenoeva.velvet.feature.home.component
+package com.subenoeva.velvet.feature.detail.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.subenoeva.velvet.core.domain.model.Movie
@@ -21,33 +17,14 @@ import com.subenoeva.velvet.core.ui.component.MovieCard
 import com.subenoeva.velvet.core.ui.theme.VelvetText
 
 @Composable
-fun MovieRow(
-    modifier: Modifier = Modifier,
-    title: String,
-    movies: List<Movie>,
-    onMovieClick: (Int) -> Unit,
-    onSeeAll: (() -> Unit)? = null
-) {
-    Column(modifier = modifier) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp, end = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                color = VelvetText,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
-            if (onSeeAll != null) {
-                TextButton(onClick = onSeeAll) {
-                    Text(text = "Ver todo")
-                }
-            }
-        }
+fun SimilarMoviesRow(movies: List<Movie>, onMovieClick: (Int) -> Unit) {
+    Column {
+        Text(
+            text = "Películas similares",
+            style = MaterialTheme.typography.titleMedium,
+            color = VelvetText,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+        )
         LazyRow(
             contentPadding = PaddingValues(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)

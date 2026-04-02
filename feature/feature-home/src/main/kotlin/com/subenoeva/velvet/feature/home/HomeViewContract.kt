@@ -17,9 +17,11 @@ object HomeViewContract {
         data object LoadContent : Intent
         data object Refresh : Intent
         data class OnMovieClick(val movieId: Int) : Intent
+        data class OnSeeAllClick(val category: String, val title: String) : Intent
     }
 
     sealed interface Event {
         data class NavigateToDetail(val movieId: Int) : Event
+        data class NavigateToCategoryList(val category: String, val title: String) : Event
     }
 }

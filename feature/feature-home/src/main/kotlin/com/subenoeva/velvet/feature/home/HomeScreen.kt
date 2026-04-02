@@ -20,8 +20,10 @@ import com.subenoeva.velvet.core.common.presentation.ObserveEvents
 import com.subenoeva.velvet.core.ui.component.ErrorState
 import com.subenoeva.velvet.core.ui.component.LoadingShimmer
 import com.subenoeva.velvet.core.ui.component.ShimmerMovieCard
+import com.subenoeva.velvet.feature.home.HomeViewContract.Event.NavigateToCategoryList
 import com.subenoeva.velvet.feature.home.HomeViewContract.Event.NavigateToDetail
 import com.subenoeva.velvet.feature.home.HomeViewContract.Intent.OnMovieClick
+import com.subenoeva.velvet.feature.home.HomeViewContract.Intent.OnSeeAllClick
 import com.subenoeva.velvet.feature.home.HomeViewContract.Intent.Refresh
 import com.subenoeva.velvet.feature.home.HomeViewContract.State
 import com.subenoeva.velvet.feature.home.component.MovieRow
@@ -30,20 +32,23 @@ import com.subenoeva.velvet.feature.home.component.TrendingCarousel
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
-    onNavigateToDetail: (Int) -> Unit
+    onNavigateToDetail: (Int) -> Unit,
+    onNavigateToCategoryList: (category: String, title: String) -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     ObserveEvents(viewModel.events) { event ->
         when (event) {
             is NavigateToDetail -> onNavigateToDetail(event.movieId)
+            is NavigateToCategoryList -> onNavigateToCategoryList(event.category, event.title)
         }
     }
 
     HomeScreenContent(
         state = state,
         onMovieClick = { viewModel.sendIntent(OnMovieClick(it)) },
-        onRetry = { viewModel.sendIntent(Refresh) }
+        onRetry = { viewModel.sendIntent(Refresh) },
+        onSeeAll = { category, title -> viewModel.sendIntent(OnSeeAllClick(category, title)) }
     )
 }
 
@@ -51,7 +56,8 @@ fun HomeScreen(
 private fun HomeScreenContent(
     state: State,
     onMovieClick: (Int) -> Unit,
-    onRetry: () -> Unit
+    onRetry: () -> Unit,
+    onSeeAll: (category: String, title: String) -> Unit
 ) {
     when {
         state.isLoading && state.trending.isEmpty() -> HomeShimmer()
@@ -70,7 +76,8 @@ private fun HomeScreenContent(
                     MovieRow(
                         title = "Populares",
                         movies = state.popular,
-                        onMovieClick = onMovieClick
+                        onMovieClick = onMovieClick,
+                        onSeeAll = { onSeeAll("popular", "Populares") }
                     )
                 }
             }
@@ -79,7 +86,8 @@ private fun HomeScreenContent(
                     MovieRow(
                         title = "Mejor valoradas",
                         movies = state.topRated,
-                        onMovieClick = onMovieClick
+                        onMovieClick = onMovieClick,
+                        onSeeAll = { onSeeAll("top_rated", "Mejor valoradas") }
                     )
                 }
             }
@@ -88,7 +96,8 @@ private fun HomeScreenContent(
                     MovieRow(
                         title = "Próximos estrenos",
                         movies = state.upcoming,
-                        onMovieClick = onMovieClick
+                        onMovieClick = onMovieClick,
+                        onSeeAll = { onSeeAll("upcoming", "Próximos estrenos") }
                     )
                 }
             }

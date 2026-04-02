@@ -11,6 +11,8 @@ import com.subenoeva.velvet.feature.detail.DetailRoute
 import com.subenoeva.velvet.feature.detail.DetailScreen
 import com.subenoeva.velvet.feature.favorites.FavoritesRoute
 import com.subenoeva.velvet.feature.favorites.FavoritesScreen
+import com.subenoeva.velvet.feature.home.category.CategoryListScreen
+import com.subenoeva.velvet.feature.home.category.CategoryRoute
 import com.subenoeva.velvet.feature.home.HomeRoute
 import com.subenoeva.velvet.feature.home.HomeScreen
 import com.subenoeva.velvet.feature.search.SearchRoute
@@ -30,7 +32,18 @@ fun VelvetNavGraph() {
             entryProvider = entryProvider {
                 entry<HomeRoute> {
                     HomeScreen(
-                        onNavigateToDetail = { backStack.add(DetailRoute(it)) }
+                        onNavigateToDetail = { backStack.add(DetailRoute(it)) },
+                        onNavigateToCategoryList = { category, title ->
+                            backStack.add(CategoryRoute(category, title))
+                        }
+                    )
+                }
+                entry<CategoryRoute> { route ->
+                    CategoryListScreen(
+                        category = route.category,
+                        title = route.title,
+                        onNavigateToDetail = { backStack.add(DetailRoute(it)) },
+                        onBack = { backStack.removeLastOrNull() }
                     )
                 }
                 entry<SearchRoute> {
@@ -41,7 +54,8 @@ fun VelvetNavGraph() {
                 entry<DetailRoute> { detailRoute ->
                     DetailScreen(
                         movieId = detailRoute.movieId,
-                        onBack = { backStack.removeLastOrNull() }
+                        onBack = { backStack.removeLastOrNull() },
+                        onNavigateToDetail = { backStack.add(DetailRoute(it)) }
                     )
                 }
                 entry<FavoritesRoute> {

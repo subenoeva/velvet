@@ -28,11 +28,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.subenoeva.velvet.core.domain.model.Cast
-
-private const val TMDB_PROFILE_URL = "https://image.tmdb.org/t/p/w185"
 import com.subenoeva.velvet.core.ui.theme.VelvetCard
 import com.subenoeva.velvet.core.ui.theme.VelvetText
 import com.subenoeva.velvet.core.ui.theme.VelvetTextSecondary
+
+private const val TMDB_PROFILE_URL = "https://image.tmdb.org/t/p/w185"
 
 @Composable
 fun CastRow(cast: List<Cast>) {
