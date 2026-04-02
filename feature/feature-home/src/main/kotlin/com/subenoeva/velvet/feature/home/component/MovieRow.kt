@@ -18,11 +18,12 @@ import com.subenoeva.velvet.core.ui.theme.VelvetText
 
 @Composable
 fun MovieRow(
+    modifier: Modifier = Modifier,
     title: String,
     movies: List<Movie>,
     onMovieClick: (Int) -> Unit
 ) {
-    Column {
+    Column(modifier = modifier) {
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium,

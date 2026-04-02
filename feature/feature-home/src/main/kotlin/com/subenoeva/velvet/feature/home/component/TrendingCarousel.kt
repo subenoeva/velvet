@@ -13,10 +13,12 @@ import com.subenoeva.velvet.core.ui.component.MovieCardLarge
 
 @Composable
 fun TrendingCarousel(
+    modifier: Modifier = Modifier,
     movies: List<Movie>,
     onMovieClick: (Int) -> Unit
 ) {
     LazyRow(
+        modifier = modifier,
         contentPadding = PaddingValues(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {

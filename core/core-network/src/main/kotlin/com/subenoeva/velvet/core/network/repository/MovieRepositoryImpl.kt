@@ -30,7 +30,6 @@ import javax.inject.Inject
 
 private const val PAGE_SIZE = 20
 private const val TRENDING_TTL_MS = 30 * 60 * 1000L
-private const val CATEGORY_TTL_MS = 30 * 60 * 1000L
 
 @OptIn(ExperimentalPagingApi::class)
 class MovieRepositoryImpl @Inject constructor(
@@ -97,7 +96,7 @@ class MovieRepositoryImpl @Inject constructor(
         emit(Result.Loading)
         try {
             val lastUpdated = movieDao.getLastUpdatedForCategory(category)
-            val isStale = lastUpdated == null || System.currentTimeMillis() - lastUpdated > CATEGORY_TTL_MS
+            val isStale = lastUpdated == null || System.currentTimeMillis() - lastUpdated > TRENDING_TTL_MS
             if (isStale) {
                 val response = when (category) {
                     "popular"   -> apiService.getPopular(1)
@@ -114,7 +113,18 @@ class MovieRepositoryImpl @Inject constructor(
                     }
                 )
             }
-        } catch (e: Exception) { /* serve from cache on network failure */ }
+        } catch (networkError: Exception) {
+            // stored to propagate if cache is empty
+            val fetchError: Exception = networkError
+            movieDao.getMoviesByCategoryPreview(category, limit)
+                .collect { entities ->
+                    if (entities.isNotEmpty())
+                        emit(Result.Success(entities.map { it.toDomain() }))
+                    else
+                        emit(Result.Error(fetchError))
+                }
+            return@flow
+        }
         movieDao.getMoviesByCategoryPreview(category, limit)
             .collect { entities ->
                 if (entities.isNotEmpty())
