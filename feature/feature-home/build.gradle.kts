@@ -11,4 +11,9 @@ dependencies {
     implementation(platform(libs.compose.bom))
     implementation(libs.paging.compose)
     implementation(libs.compose.material3)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.turbine)
+    testImplementation(libs.coroutines.test)
 }

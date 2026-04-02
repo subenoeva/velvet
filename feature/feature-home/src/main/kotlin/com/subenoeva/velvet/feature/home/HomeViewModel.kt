@@ -14,16 +14,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel
-@Inject constructor(
-    private val getPopularMoviesUseCase: GetPopularMoviesUseCase
-) : BaseViewModel<State, Intent, Event>(State()) {
+class HomeViewModel @Inject constructor(
+    getPopularMoviesUseCase: GetPopularMoviesUseCase
+) : BaseViewModel<State, Intent, Event>(State) {
 
-    init {
-        updateState {
-            copy(moviesPagingFlow = getPopularMoviesUseCase(NoParams).cachedIn(viewModelScope))
-        }
-    }
+    val moviesPagingFlow = getPopularMoviesUseCase(NoParams).cachedIn(viewModelScope)
 
     override suspend fun handleIntent(intent: Intent) {
         when (intent) {
