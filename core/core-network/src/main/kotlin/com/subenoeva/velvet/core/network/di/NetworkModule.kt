@@ -2,6 +2,7 @@ package com.subenoeva.velvet.core.network.di
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.subenoeva.velvet.core.domain.repository.MovieRepository
+import com.subenoeva.velvet.core.network.BuildConfig
 import com.subenoeva.velvet.core.network.api.TmdbApiService
 import com.subenoeva.velvet.core.network.interceptor.AuthInterceptor
 import com.subenoeva.velvet.core.network.repository.MovieRepositoryImpl
@@ -30,6 +31,10 @@ object NetworkProviderModule {
         ignoreUnknownKeys = true
         coerceInputValues = true
     }
+
+    @Provides
+    @Named("tmdb_api_key")
+    fun provideTmdbApiKey(): String = BuildConfig.TMDB_API_KEY
 
     @Provides
     @Singleton

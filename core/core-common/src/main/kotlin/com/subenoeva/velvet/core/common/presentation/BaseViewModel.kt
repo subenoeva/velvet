@@ -10,27 +10,32 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-abstract class BaseViewModel<UiState, UiIntent, UiEvent>(
-    initialState: UiState
+abstract class BaseViewModel<State, Intent, Event>(
+    initialState: State
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(initialState)
-    val uiState = _uiState.asStateFlow()
+    private val _state = MutableStateFlow(initialState)
+    val state = _state.asStateFlow()
 
-    private val _uiEvents = Channel<UiEvent>(Channel.BUFFERED)
-    val uiEvents = _uiEvents.receiveAsFlow()
+    private val _events = Channel<Event>(Channel.BUFFERED)
+    val events = _events.receiveAsFlow()
 
-    protected fun setState(newState: UiState) { _uiState.value = newState }
-    protected fun updateState(transform: UiState.() -> UiState) { _uiState.update { transform(it) } }
-    protected fun sendEvent(event: UiEvent) { _uiEvents.trySend(event) }
-
-    private val uiIntents = MutableSharedFlow<UiIntent>(extraBufferCapacity = 64)
+    private val intents = MutableSharedFlow<Intent>(extraBufferCapacity = 64)
 
     init {
-        viewModelScope.launch { uiIntents.collect { intent -> handleIntent(intent) } }
+        viewModelScope.launch {
+            intents.collect { intent ->
+                handleIntent(intent)
+            }
+        }
     }
 
-    fun sendIntent(intent: UiIntent) { uiIntents.tryEmit(intent) }
-    protected abstract suspend fun handleIntent(intent: UiIntent)
-    protected val currentState: UiState get() = _uiState.value
+    fun sendIntent(intent: Intent) { intents.tryEmit(intent) }
+
+    protected fun setState(newState: State) { _state.value = newState }
+    protected fun updateState(transform: State.() -> State) { _state.update { transform(it) } }
+    protected fun sendEvent(event: Event) { _events.trySend(event) }
+
+    protected abstract suspend fun handleIntent(intent: Intent)
+    protected val currentState: State get() = _state.value
 }

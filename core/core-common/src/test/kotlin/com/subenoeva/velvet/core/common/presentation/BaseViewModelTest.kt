@@ -40,7 +40,7 @@ class BaseViewModelTest {
         data object Done : TestEvent
     }
 
-    private inner class TestViewModel : BaseViewModel<TestState, TestIntent, TestEvent>(TestState()) {
+    private class TestViewModel : BaseViewModel<TestState, TestIntent, TestEvent>(TestState()) {
         override suspend fun handleIntent(intent: TestIntent) {
             when (intent) {
                 TestIntent.Increment -> updateState { copy(count = count + 1) }
@@ -54,7 +54,7 @@ class BaseViewModelTest {
     @Test
     fun `initial state is emitted`() = runTest {
         val vm = TestViewModel()
-        vm.uiState.test {
+        vm.state.test {
             assertEquals(TestState(0), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
@@ -63,7 +63,7 @@ class BaseViewModelTest {
     @Test
     fun `setState updates uiState`() = runTest {
         val vm = TestViewModel()
-        vm.uiState.test {
+        vm.state.test {
             assertEquals(TestState(0), awaitItem())
             vm.sendIntent(TestIntent.Increment)
             assertEquals(TestState(1), awaitItem())
@@ -74,7 +74,7 @@ class BaseViewModelTest {
     @Test
     fun `sendEvent emits to uiEvents`() = runTest {
         val vm = TestViewModel()
-        vm.uiEvents.test {
+        vm.events.test {
             vm.sendIntent(TestIntent.SendEvent)
             assertEquals(TestEvent.Done, awaitItem())
             cancelAndIgnoreRemainingEvents()
@@ -85,6 +85,6 @@ class BaseViewModelTest {
     fun `currentState reflects latest state`() = runTest {
         val vm = TestViewModel()
         vm.sendIntent(TestIntent.Increment)
-        assertEquals(1, vm.uiState.value.count)
+        assertEquals(1, vm.state.value.count)
     }
 }

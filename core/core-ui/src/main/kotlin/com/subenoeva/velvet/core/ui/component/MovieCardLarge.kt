@@ -28,12 +28,12 @@ private const val TMDB_BACKDROP_BASE_URL = "https://image.tmdb.org/t/p/w780"
 
 @Composable
 fun MovieCardLarge(
+    modifier: Modifier = Modifier,
     backdropPath: String?,
     title: String,
     overview: String,
     rating: Double,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    onClick: () -> Unit
 ) {
     Box(
         modifier = modifier

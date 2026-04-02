@@ -1,12 +1,28 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.velvet.android.library)
-    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.serialization)
+}
+
+private val localProperties = Properties().apply {
+    rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
 }
 
 android {
     namespace = "com.subenoeva.velvet.core.network"
+
+    buildFeatures { buildConfig = true }
+
+    defaultConfig {
+        buildConfigField(
+            "String",
+            "TMDB_API_KEY",
+            "\"${localProperties.getProperty("TMDB_API_KEY", "")}\""
+        )
+    }
 }
 
 dependencies {

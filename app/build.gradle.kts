@@ -4,10 +4,6 @@ plugins {
     alias(libs.plugins.velvet.android.application)
 }
 
-val localProperties = Properties().apply {
-    rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
-}
-
 android {
     namespace = "com.subenoeva.velvet"
 
@@ -16,11 +12,6 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField(
-            "String",
-            "TMDB_API_KEY",
-            "\"${localProperties.getProperty("TMDB_API_KEY", "")}\""
-        )
     }
 
     buildTypes {

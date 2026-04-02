@@ -9,5 +9,6 @@ android {
 dependencies {
     implementation(project(":core:core-network"))
     implementation(platform(libs.compose.bom))
+    implementation(libs.paging.compose)
     implementation(libs.compose.material3)
 }

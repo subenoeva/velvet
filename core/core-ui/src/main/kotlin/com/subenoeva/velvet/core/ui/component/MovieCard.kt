@@ -27,11 +27,11 @@ private const val TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500"
 
 @Composable
 fun MovieCard(
+    modifier: Modifier = Modifier,
     posterPath: String?,
     title: String,
     rating: Double,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    onClick: () -> Unit
 ) {
     Column(
         modifier = modifier
