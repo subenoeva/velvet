@@ -35,10 +35,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.core.net.toUri
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import android.content.Intent as AndroidIntent
-import android.net.Uri
 import coil3.compose.AsyncImage
 import com.subenoeva.velvet.core.common.presentation.ObserveEvents
 import com.subenoeva.velvet.core.ui.component.ErrorState
@@ -51,12 +50,20 @@ import com.subenoeva.velvet.core.ui.theme.VelvetCard
 import com.subenoeva.velvet.core.ui.theme.VelvetSurface
 import com.subenoeva.velvet.core.ui.theme.VelvetText
 import com.subenoeva.velvet.core.ui.theme.VelvetTextSecondary
+import com.subenoeva.velvet.feature.detail.DetailViewContract.Event.NavigateToDetail
+import com.subenoeva.velvet.feature.detail.DetailViewContract.Event.OpenTrailer
+import com.subenoeva.velvet.feature.detail.DetailViewContract.Intent.LoadDetail
+import com.subenoeva.velvet.feature.detail.DetailViewContract.Intent.PlayTrailer
+import com.subenoeva.velvet.feature.detail.DetailViewContract.Intent.SimilarMovieClicked
+import com.subenoeva.velvet.feature.detail.DetailViewContract.Intent.ToggleFavorite
+import com.subenoeva.velvet.feature.detail.DetailViewContract.State
 import com.subenoeva.velvet.feature.detail.component.CastRow
 import com.subenoeva.velvet.feature.detail.component.FavoriteButton
 import com.subenoeva.velvet.feature.detail.component.SimilarMoviesRow
+import android.content.Intent as AndroidIntent
 
 private const val TMDB_BACKDROP_URL = "https://image.tmdb.org/t/p/w780"
-private const val TMDB_POSTER_URL   = "https://image.tmdb.org/t/p/w500"
+private const val TMDB_POSTER_URL = "https://image.tmdb.org/t/p/w500"
 
 @Composable
 fun DetailScreen(
@@ -69,19 +76,20 @@ fun DetailScreen(
     val context = LocalContext.current
 
     LaunchedEffect(movieId) {
-        viewModel.sendIntent(DetailViewContract.Intent.LoadDetail(movieId))
+        viewModel.sendIntent(LoadDetail(movieId))
     }
 
     ObserveEvents(viewModel.events) { event ->
         when (event) {
-            is DetailViewContract.Event.OpenTrailer -> {
+            is OpenTrailer -> {
                 val intent = AndroidIntent(
                     AndroidIntent.ACTION_VIEW,
-                    Uri.parse("https://www.youtube.com/watch?v=${event.youtubeKey}")
+                    "https://www.youtube.com/watch?v=${event.youtubeKey}".toUri()
                 )
                 runCatching { context.startActivity(intent) }
             }
-            is DetailViewContract.Event.NavigateToDetail -> onNavigateToDetail(event.movieId)
+
+            is NavigateToDetail -> onNavigateToDetail(event.movieId)
         }
     }
 
@@ -105,17 +113,17 @@ fun DetailScreen(
         DetailContent(
             state = state,
             modifier = Modifier.padding(padding),
-            onRetry = { viewModel.sendIntent(DetailViewContract.Intent.LoadDetail(movieId)) },
-            onToggleFavorite = { viewModel.sendIntent(DetailViewContract.Intent.ToggleFavorite) },
-            onPlayTrailer = { viewModel.sendIntent(DetailViewContract.Intent.PlayTrailer) },
-            onSimilarMovieClick = { viewModel.sendIntent(DetailViewContract.Intent.SimilarMovieClicked(it)) }
+            onRetry = { viewModel.sendIntent(LoadDetail(movieId)) },
+            onToggleFavorite = { viewModel.sendIntent(ToggleFavorite) },
+            onPlayTrailer = { viewModel.sendIntent(PlayTrailer) },
+            onSimilarMovieClick = { viewModel.sendIntent(SimilarMovieClicked(it)) }
         )
     }
 }
 
 @Composable
 private fun DetailContent(
-    state: DetailViewContract.State,
+    state: State,
     modifier: Modifier = Modifier,
     onRetry: () -> Unit,
     onToggleFavorite: () -> Unit,
@@ -124,11 +132,13 @@ private fun DetailContent(
 ) {
     when {
         state.isLoading && state.movie == null -> DetailShimmer(modifier)
+
         state.error != null && state.movie == null -> ErrorState(
             message = state.error,
             onRetry = onRetry,
             modifier = modifier.fillMaxSize()
         )
+
         else -> state.movie?.let { movie ->
             LazyColumn(
                 modifier = modifier.fillMaxSize()
@@ -306,12 +316,24 @@ private fun DetailShimmer(modifier: Modifier = Modifier) {
                 .height(220.dp)
         )
         Row(modifier = Modifier.padding(16.dp)) {
-            LoadingShimmer(modifier = Modifier.width(100.dp).height(150.dp))
+            LoadingShimmer(
+                modifier = Modifier
+                    .width(100.dp)
+                    .height(150.dp)
+            )
             Spacer(modifier = Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
-                LoadingShimmer(modifier = Modifier.fillMaxWidth().height(20.dp))
+                LoadingShimmer(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(20.dp)
+                )
                 Spacer(modifier = Modifier.height(8.dp))
-                LoadingShimmer(modifier = Modifier.width(160.dp).height(14.dp))
+                LoadingShimmer(
+                    modifier = Modifier
+                        .width(160.dp)
+                        .height(14.dp)
+                )
             }
         }
     }
