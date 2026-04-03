@@ -28,6 +28,13 @@ class SearchViewModel @Inject constructor(
     private val searchMovies: SearchMoviesUseCase
 ) : BaseViewModel<State, Intent, Event>(State()) {
 
+    /**
+     * Paging results derived reactively from [state].query.
+     *
+     * The pipeline applies a 300ms debounce and skips queries shorter than 2 characters,
+     * so results do not appear immediately after each keystroke. [flatMapLatest] cancels
+     * any in-flight search when the query changes, and [cachedIn] survives recomposition.
+     */
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val pagingResults: Flow<PagingData<Movie>> = state
         .map { it.query }
