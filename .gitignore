@@ -36,3 +36,6 @@ google-services.json
 # Internal docs / plans (never commit)
 docs/
 /.claude/settings.local.json
+
+# Git worktrees
+.worktrees/
