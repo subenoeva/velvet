@@ -3,7 +3,6 @@ package com.subenoeva.velvet.feature.search
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.subenoeva.velvet.core.common.dispatcher.DispatcherProvider
 import com.subenoeva.velvet.core.common.presentation.BaseViewModel
 import com.subenoeva.velvet.core.domain.model.Movie
 import com.subenoeva.velvet.core.domain.usecase.movie.SearchMoviesUseCase
@@ -26,8 +25,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    private val searchMovies: SearchMoviesUseCase,
-    private val dispatchers: DispatcherProvider
+    private val searchMovies: SearchMoviesUseCase
 ) : BaseViewModel<State, Intent, Event>(State()) {
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
